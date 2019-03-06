@@ -31,35 +31,68 @@ class Pintle:
 
         self.name = setting.get("全体", "名前")
         #self.is_save_fig = setting.getboolean("全体", "図を保存する？")
-        self.PTDia = setting.getfloat("PintleDim", "Pintle Tip Diameter Dp[mm]")
-        self.Dist_Ls = setting.getfloat("PintleDim", "Skip Distance Ls[mm]")
-        self.Dist_Dfo = setting.getfloat("PintleDim", "Fuel channel Outer Diameter Dfo[mm]")
-        self.Dist_Doi = setting.getfloat("PintleDim", "LOx channel Inner Diameter Doi [mm]")
-        self.Dist_Lo1 = setting.getfloat("PintleDim", "Primary Oxidizer slot height Lo1[mm]")
-        self.Dist_deltao1 = setting.getfloat("PintleDim", "Primary Oxidizer slot Circumferential size deltao1[mm]")
-        self.Dist_Lo2 = setting.getfloat("PintleDim", "Secondary Oxidizer slot height Lo2[mm]")
-        self.Dist_deltao2 = setting.getfloat("PintleDim", "Secondary Oxidizer slot Circumferential size deltao2[mm]")
-        self.SP_N1 = setting.getfloat("PintleDim", "Number of Primary slots N1")
-        self.SP_N2 = setting.getfloat("PintleDim", "Number of Secondary slots N2")
-        self.Dist_Lo12 = setting.getfloat("PintleDim", "Distance between Primary and Secondary Oxidizer slots Lo12[mm]")
-        self.rho_o = setting.getfloat("OxidizerProp", "LOx Density[kg/m3]")
-        self.mdot_o = setting.getfloat("OxidizerProp", "LOx mass flow rate [kg/s]")
-        self.rho_f = setting.getfloat("FuelProp", "Fuel Density[kg/m3]")
-        self.mdot_f = setting.getfloat("FuelProp", "Fuel mass flow rate [kg/s]")
-        self.LOx_Cv = setting.getfloat("InjectorParam", "LOx injector Cv")
-        self.Fuel_Cv = setting.getfloat("InjectorParam", "Fuel injector Cv")
+        Dist_Dp = setting.getfloat("PintleDim", "Pintle Tip Diameter Dp[mm]")/10**3
+        Dist_Ls = setting.getfloat("PintleDim", "Skip Distance Ls[mm]")/10**3
+        Dist_Dfo = setting.getfloat("PintleDim", "Fuel channel Outer Diameter Dfo[mm]")/10**3
+        Dist_Doi = setting.getfloat("PintleDim", "LOx channel Inner Diameter Doi [mm]")/10**3
+        Dist_Lo1 = setting.getfloat("PintleDim", "Primary Oxidizer slot height Lo1[mm]")/10**3
+        Dist_deltao1 = setting.getfloat("PintleDim", "Primary Oxidizer slot Circumferential size deltao1[mm]")/10**3
+        Dist_Lo2 = setting.getfloat("PintleDim", "Secondary Oxidizer slot height Lo2[mm]")/10**3
+        Dist_deltao2 = setting.getfloat("PintleDim", "Secondary Oxidizer slot Circumferential size deltao2[mm]")/10**3
+        CN_N1 = setting.getfloat("PintleDim", "Number of Primary slots N1")
+        CN_N2 = setting.getfloat("PintleDim", "Number of Secondary slots N2")
+        Dist_Lo12 = setting.getfloat("PintleDim", "Distance between Primary and Secondary Oxidizer slots Lo12[mm]")/10**3
+        rho_o = setting.getfloat("OxidizerProp", "LOx Density[kg/m3]")
+        mdot_o = setting.getfloat("OxidizerProp", "LOx mass flow rate [kg/s]")
+        rho_f = setting.getfloat("FuelProp", "Fuel Density[kg/m3]")
+        mdot_f = setting.getfloat("FuelProp", "Fuel mass flow rate [kg/s]")
+        LOx_Cd = setting.getfloat("InjectorParam", "LOx injector Cd")
+        Fuel_Cd = setting.getfloat("InjectorParam", "Fuel injector Cd")
 
-        #LOx side injector area
-        self.Area_LOx = 1
+        #Injector geometry area
+        self.Area_LOx1 = Dist_Lo1*Dist_deltao1*CN_N1
+        self.Area_LOx2 = Dist_Lo2*Dist_deltao2*CN_N2
+        self.Area_LOx = self.Area_LOx1+self.Area_LOx2
+        self.Area_Fuel = (Dist_Dfo**2-Dist_Dp**2)*np.pi/4
+        self.BLF1 = CN_N1*Dist_deltao1/np.pi/Dist_Dp
+        self.BLF2 = CN_N2*Dist_deltao2/np.pi/Dist_Dp
+        self.LOx_PA_ratio = self.Area_LOx1/(self.Area_LOx1+self.Area_LOx2)
 
+        #flow velocity
+        self.LOx_vo1 = mdot_o*self.LOx_PA_ratio/rho_o/self.Area_LOx1
+        self.LOx_vo2 = mdot_o*(1-self.LOx_PA_ratio)/rho_o/self.Area_LOx2
+        self.Fuel_vf = mdot_f/rho_f/self.Area_Fuel
+        self.Mom_Ff = rho_f*self.Fuel_vf**2*self.Area_Fuel
+        self.Mom_Fo = rho_o*self.LOx_vo1**2*self.Area_LOx
+        self.TMR = self.Mom_Ff/self.Mom_Fo
 
+        #Other Parameters
+        self.Skip_Dist_D = Dist_Ls/Dist_Dp
+        self.Skip_Dist_V = Dist_Ls/self.Fuel_vf
+
+        #Pressure loss delta p
+        self.deltap_o =  mdot_o**2/(2*rho_o*self.Area_LOx**2*LOx_Cd**2)/10**6       
+        self.deltap_f = mdot_f**2/(2*rho_f*self.Area_Fuel**2*Fuel_Cd**2)/10**6
+        
 
     def display(self):
-    	 print("TMR (Total Momentum Ratio) :\t\t%.1f " % (self.Area_LOx))
+    	 print("")
+    	 print("TMR (Total Momentum Ratio) :\t\t%.2f " % (self.TMR))
+    	 print("LOx Primary slot flow ratio:\t\t%.2f " % (self.LOx_PA_ratio))
+    	 print("LOx Outlet Velocity vo1 [m/s] :\t\t%.1f " % (self.LOx_vo1))
+    	 print("Fuel Outlet Velocity vf [m/s] :\t\t%.1f " % (self.Fuel_vf))    	 
+    	 print("")
+    	 print("Non-Dimensional skip distance Ls/Dp :\t%.2f " % (self.Skip_Dist_D))
+    	 print("Normalized skip distance Ls/vf[s] :\t%.5f " % (self.Skip_Dist_V))
+    	 print("")
+    	 print("Primary slot Blockage Factor :\t\t%.2f " % (self.BLF1))
+    	 print("Secondary slot Blockage Factor :\t%.2f " % (self.BLF2))
+    	 print("Fuel Injector delta p [MPa]:\t\t%.2f " % (self.deltap_f))
+    	 print("Oxidizer Injector delta p [MPa]:\t%.2f " % (self.deltap_o))
 
     def print(self):
     	with open("PintleParams.out","w") as output:
-    		print("TMR (Total Momentum Ratio) :\t\t%.1f " % (self.Area_LOx),file=output)  
+    		print("TMR (Total Momentum Ratio) :\t\t%.1f " % (self.Area_LOx1),file=output)  
 
 
 
@@ -79,7 +112,7 @@ if __name__ == '__main__':
         assert os.path.exists(setting_file), "ファイルが存在しません"
     plt.close("all")
     plt.ion()
-    pintout = Pintle(setting_file)
-    pintout.display()
-    #pintout.print()
+    pout = Pintle(setting_file)
+    pout.display()
+    #pout.print()
  
