@@ -63,7 +63,9 @@ class Pintle:
         self.LOx_vo2 = mdot_o*(1-self.LOx_PA_ratio)/rho_o/self.Area_LOx2
         self.Fuel_vf = mdot_f/rho_f/self.Area_Fuel
         self.Mom_Ff = rho_f*self.Fuel_vf**2*self.Area_Fuel
-        self.Mom_Fo = rho_o*self.LOx_vo1**2*self.Area_LOx
+        self.Mom_Fo1 = rho_o*self.LOx_vo1**2*self.Area_LOx1
+        self.Mom_Fo2 = rho_o*self.LOx_vo2**2*self.Area_LOx2
+        self.Mom_Fo = self.Mom_Fo1+self.Mom_Fo2
         self.TMR = self.Mom_Ff/self.Mom_Fo
 
         #Other Parameters
@@ -77,7 +79,7 @@ class Pintle:
 
     def display(self):
     	 print("")
-    	 print("TMR (Total Momentum Ratio) :\t\t%.2f " % (self.TMR))
+    	 print("TMR (Total Momentum Ratio) :\t\t%.2f " % (self.TMR))    	 
     	 print("LOx Primary slot flow ratio:\t\t%.2f " % (self.LOx_PA_ratio))
     	 print("LOx Outlet Velocity vo1 [m/s] :\t\t%.1f " % (self.LOx_vo1))
     	 print("Fuel Outlet Velocity vf [m/s] :\t\t%.1f " % (self.Fuel_vf))    	 
@@ -92,17 +94,19 @@ class Pintle:
 
     def print(self):
     	with open("PintleParams.out","w") as output:
-    		print("TMR (Total Momentum Ratio) :\t\t%.1f " % (self.Area_LOx1),file=output)  
+    	 print("TMR (Total Momentum Ratio) :\t\t%.2f " % (self.TMR),file=output)
+    	 print("LOx Primary slot flow ratio:\t\t%.2f " % (self.LOx_PA_ratio),file=output)
+    	 print("LOx Outlet Velocity vo1 [m/s] :\t\t%.1f " % (self.LOx_vo1),file=output)
+    	 print("Fuel Outlet Velocity vf [m/s] :\t\t%.1f " % (self.Fuel_vf),file=output)
+    	 print("Non-Dimensional skip distance Ls/Dp :\t%.2f " % (self.Skip_Dist_D),file=output)
+    	 print("Normalized skip distance Ls/vf[s] :\t%.5f " % (self.Skip_Dist_V),file=output)
+    	 print("Primary slot Blockage Factor :\t\t%.2f " % (self.BLF1),file=output)
+    	 print("Secondary slot Blockage Factor :\t%.2f " % (self.BLF2),file=output)
+    	 print("Fuel Injector delta p [MPa]:\t\t%.2f " % (self.deltap_f),file=output)
+    	 print("Oxidizer Injector delta p [MPa]:\t%.2f " % (self.deltap_o),file=output)
 
 
 
-"""
-CL出力
-    def print(self):
-        with open("tankout_S1.out","w") as output:
-            print("タンク鏡重量:\t%.1f [kg]" %(self.hoge),file=output) #add
-       
-"""
 
 if __name__ == '__main__':
     if len(sys.argv) == 1:
@@ -114,5 +118,6 @@ if __name__ == '__main__':
     plt.ion()
     pout = Pintle(setting_file)
     pout.display()
-    #pout.print()
+    pout.print()
+
  
