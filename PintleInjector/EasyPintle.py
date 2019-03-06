@@ -61,6 +61,7 @@ class Pintle:
         #flow velocity
         self.LOx_vo1 = mdot_o*self.LOx_PA_ratio/rho_o/self.Area_LOx1
         self.LOx_vo2 = mdot_o*(1-self.LOx_PA_ratio)/rho_o/self.Area_LOx2
+        self.LOx_vo = self.LOx_vo1
         self.Fuel_vf = mdot_f/rho_f/self.Area_Fuel
         self.Mom_Ff = rho_f*self.Fuel_vf**2*self.Area_Fuel
         self.Mom_Fo1 = rho_o*self.LOx_vo1**2*self.Area_LOx1
@@ -71,6 +72,7 @@ class Pintle:
         #Other Parameters
         self.Skip_Dist_D = Dist_Ls/Dist_Dp
         self.Skip_Dist_V = Dist_Ls/self.Fuel_vf
+        self.ATM_Cone = np.arctan(mdot_o/mdot_f)*180/np.pi
 
         #Pressure loss delta p
         self.deltap_o =  mdot_o**2/(2*rho_o*self.Area_LOx**2*LOx_Cd**2)/10**6       
@@ -86,6 +88,7 @@ class Pintle:
     	 print("")
     	 print("Non-Dimensional skip distance Ls/Dp :\t%.2f " % (self.Skip_Dist_D))
     	 print("Normalized skip distance Ls/vf[s] :\t%.5f " % (self.Skip_Dist_V))
+    	 print("Theoretical Atomizing Cone angle[deg]:\t%.2f " % (self.ATM_Cone))
     	 print("")
     	 print("Primary slot Blockage Factor :\t\t%.2f " % (self.BLF1))
     	 print("Secondary slot Blockage Factor :\t%.2f " % (self.BLF2))
