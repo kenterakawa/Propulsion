@@ -1,5 +1,5 @@
 # Propulsion
-Personal tools for propulsion calculation
+推進系計算用ツールです。
 
 # PintleInjector
-Pintle injector design tool
+ピントルインジェクタの設計ツールです
