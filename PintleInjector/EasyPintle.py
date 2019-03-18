@@ -72,7 +72,7 @@ class Pintle:
         #Other Parameters
         self.Skip_Dist_D = Dist_Ls/Dist_Dp
         self.Skip_Dist_V = Dist_Ls/self.Fuel_vf
-        self.ATM_Cone = np.arctan(mdot_o/mdot_f)*180/np.pi
+        self.ATM_Cone = np.arctan(self.TMR)*180/np.pi
 
         #Pressure loss delta p
         self.deltap_o =  mdot_o**2/(2*rho_o*self.Area_LOx**2*LOx_Cd**2)/10**6       
