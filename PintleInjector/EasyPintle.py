@@ -78,8 +78,8 @@ class Pintle:
 
         #mixing paramter, final momemtum ratio
         self.mppar_a = (self.Fuel_vf*rho_f/rho_gf*mdot_f+self.LOx_vo*rho_o/rho_go*mdot_o)/(mdot_f+mdot_o)
-        self.mppar_C1 = Dist_Lo1/self.Fuel_vf*self.mppar_a/Dist_Lo12*self.BLF1
-        self.mppar_C2 = Dist_Lo2/self.Fuel_vf*self.mppar_a/Dist_Lo12*self.BLF2
+        self.mppar_C1 = Dist_Lo1/self.Fuel_vf*self.mppar_a*CN_N1/np.pi/Dist_Dp*self.BLF1/(1-self.BLF1)
+        self.mppar_C2 = Dist_Lo2/self.Fuel_vf*self.mppar_a*CN_N2/np.pi/Dist_Dp*self.BLF2/(1-self.BLF2)
         self.mp1 = (rho_f*self.Fuel_vf**2*(Dist_Dfo-Dist_Dp)/2*(Dist_deltao1+2*self.mppar_C1*Dist_Lo1))/(rho_o*self.LOx_vo1**2*Dist_deltao1*Dist_Lo1)
         self.mp2 = (rho_f*self.Fuel_vf**2*(Dist_Dfo-Dist_Dp)/2*(Dist_deltao2+2*self.mppar_C2*Dist_Lo2))/(rho_o*self.LOx_vo1**2*Dist_deltao2*Dist_Lo2)
 
@@ -104,9 +104,10 @@ class Pintle:
     	 print("Fuel Injector delta p [MPa]:\t\t%.2f " % (self.deltap_f))
     	 print("Oxidizer Injector delta p [MPa]:\t%.2f " % (self.deltap_o))
     	 print("")
-    	 print("Primary Mixing Parameter coefficient a:\t\t%.2f " % (self.mppar_a)) 
+    	 print("Primary Mixing Parameter coefficient a:\t\t%.2f " % (self.mppar_a))
     	 print("Primary Mixing Parameter :\t\t%.2f " % (self.mp1)) 
     	 print("Secondary Mixing Parameter :\t\t%.2f " % (self.mp2))
+    	 print("Primary Mixing Parameter coefficient C1:\t\t%.2f " % (self.mppar_C1))
 
     def print(self):
     	with open("PintleParams.out","w") as output:
