@@ -43,8 +43,10 @@ class Pintle:
         CN_N2 = setting.getfloat("PintleDim", "Number of Secondary slots N2")
         Dist_Lo12 = setting.getfloat("PintleDim", "Distance between Primary and Secondary Oxidizer slots Lo12[mm]")/10**3
         rho_o = setting.getfloat("OxidizerProp", "LOx Density[kg/m3]")
+        rho_go = setting.getfloat("OxidizerProp", "LOx Two Phase Density[kg/m3]")
         mdot_o = setting.getfloat("OxidizerProp", "LOx mass flow rate [kg/s]")
         rho_f = setting.getfloat("FuelProp", "Fuel Density[kg/m3]")
+        rho_gf = setting.getfloat("FuelProp", "Fuel Two Phase Density[kg/m3]")
         mdot_f = setting.getfloat("FuelProp", "Fuel mass flow rate [kg/s]")
         LOx_Cd = setting.getfloat("InjectorParam", "LOx injector Cd")
         Fuel_Cd = setting.getfloat("InjectorParam", "Fuel injector Cd")
@@ -74,6 +76,13 @@ class Pintle:
         self.Skip_Dist_V = Dist_Ls/self.Fuel_vf
         self.ATM_Cone = np.arctan(self.TMR**0.5)*180/np.pi
 
+        #mixing paramter, final momemtum ratio
+        self.mppar_a = (self.Fuel_vf*rho_f/rho_gf*mdot_f+self.LOx_vo*rho_o/rho_go*mdot_o)/(mdot_f+mdot_o)
+        self.mppar_C1 = Dist_Lo1/self.Fuel_vf*self.mppar_a/Dist_Lo12*self.BLF1
+        self.mppar_C2 = Dist_Lo2/self.Fuel_vf*self.mppar_a/Dist_Lo12*self.BLF2
+        self.mp1 = (rho_f*self.Fuel_vf**2*(Dist_Dfo-Dist_Dp)/2*(Dist_deltao1+2*self.mppar_C1*Dist_Lo1))/(rho_o*self.LOx_vo1**2*Dist_deltao1*Dist_Lo1)
+        self.mp2 = (rho_f*self.Fuel_vf**2*(Dist_Dfo-Dist_Dp)/2*(Dist_deltao2+2*self.mppar_C2*Dist_Lo2))/(rho_o*self.LOx_vo1**2*Dist_deltao2*Dist_Lo2)
+
         #Pressure loss delta p
         self.deltap_o =  mdot_o**2/(2*rho_o*self.Area_LOx**2*LOx_Cd**2)/10**6       
         self.deltap_f = mdot_f**2/(2*rho_f*self.Area_Fuel**2*Fuel_Cd**2)/10**6
@@ -94,6 +103,10 @@ class Pintle:
     	 print("Secondary slot Blockage Factor :\t%.2f " % (self.BLF2))
     	 print("Fuel Injector delta p [MPa]:\t\t%.2f " % (self.deltap_f))
     	 print("Oxidizer Injector delta p [MPa]:\t%.2f " % (self.deltap_o))
+    	 print("")
+    	 print("Primary Mixing Parameter coefficient a:\t\t%.2f " % (self.mppar_a)) 
+    	 print("Primary Mixing Parameter :\t\t%.2f " % (self.mp1)) 
+    	 print("Secondary Mixing Parameter :\t\t%.2f " % (self.mp2))
 
     def print(self):
     	with open("PintleParams.out","w") as output:
@@ -107,6 +120,9 @@ class Pintle:
     	 print("Secondary slot Blockage Factor :\t%.2f " % (self.BLF2),file=output)
     	 print("Fuel Injector delta p [MPa]:\t\t%.2f " % (self.deltap_f),file=output)
     	 print("Oxidizer Injector delta p [MPa]:\t%.2f " % (self.deltap_o),file=output)
+    	 print("Primary Mixing Parameter :\t\t%.2f " % (self.mp1),file=output) 
+    	 print("Secondary Mixing Parameter :\t\t%.2f " % (self.mp2),file=output) 
+    	 print("Primary Mixing Parameter coefficient a:\t\t%.2f " % (self.mppar_a),file=output) 
 
 
 
