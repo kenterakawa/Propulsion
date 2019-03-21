@@ -50,6 +50,7 @@ class Pintle:
         mdot_f = setting.getfloat("FuelProp", "Fuel mass flow rate [kg/s]")
         LOx_Cd = setting.getfloat("InjectorParam", "LOx injector Cd")
         Fuel_Cd = setting.getfloat("InjectorParam", "Fuel injector Cd")
+        ORD_FMR_a = setting.getfloat("InjectorParam", "Velocity a for FMR [m/s]")
 
         #Injector geometry area
         self.Area_LOx1 = Dist_Lo1*Dist_deltao1*CN_N1
@@ -76,8 +77,13 @@ class Pintle:
         self.Skip_Dist_V = Dist_Ls/self.Fuel_vf
         self.ATM_Cone = np.arctan(self.TMR**0.5)*180/np.pi
 
+        #Index a for mixing paramter
+        #self.mppar_a = (self.Fuel_vf*rho_f/rho_gf*mdot_f+self.LOx_vo*rho_o/rho_go*mdot_o)/(mdot_f+mdot_o)
+        
+        #Manual Setting (a=184~242 m/s)
+        self.mppar_a = ORD_FMR_a
+        
         #mixing paramter, final momemtum ratio
-        self.mppar_a = (self.Fuel_vf*rho_f/rho_gf*mdot_f+self.LOx_vo*rho_o/rho_go*mdot_o)/(mdot_f+mdot_o)
         self.mppar_C1 = Dist_Lo1/self.Fuel_vf*self.mppar_a*CN_N1/np.pi/Dist_Dp*self.BLF1/(1-self.BLF1)
         self.mppar_C2 = Dist_Lo2/self.Fuel_vf*self.mppar_a*CN_N2/np.pi/Dist_Dp*self.BLF2/(1-self.BLF2)
         self.mp1 = (rho_f*self.Fuel_vf**2*(Dist_Dfo-Dist_Dp)/2*(Dist_deltao1+2*self.mppar_C1*Dist_Lo1))/(rho_o*self.LOx_vo1**2*Dist_deltao1*Dist_Lo1)
@@ -104,7 +110,7 @@ class Pintle:
     	 print("Fuel Injector delta p [MPa]:\t\t%.2f " % (self.deltap_f))
     	 print("Oxidizer Injector delta p [MPa]:\t%.2f " % (self.deltap_o))
     	 print("")
-    	 print("Primary Mixing Parameter coefficient a:\t\t%.2f " % (self.mppar_a))
+    	 #print("Primary Mixing Parameter coefficient a:\t\t%.2f " % (self.mppar_a))
     	 print("Primary Mixing Parameter :\t\t%.2f " % (self.mp1)) 
     	 print("Secondary Mixing Parameter :\t\t%.2f " % (self.mp2))
     	 print("Primary Mixing Parameter coefficient C1:\t\t%.2f " % (self.mppar_C1))
@@ -123,7 +129,7 @@ class Pintle:
     	 print("Oxidizer Injector delta p [MPa]:\t%.2f " % (self.deltap_o),file=output)
     	 print("Primary Mixing Parameter :\t\t%.2f " % (self.mp1),file=output) 
     	 print("Secondary Mixing Parameter :\t\t%.2f " % (self.mp2),file=output) 
-    	 print("Primary Mixing Parameter coefficient a:\t\t%.2f " % (self.mppar_a),file=output) 
+    	 #print("Primary Mixing Parameter coefficient a:\t\t%.2f " % (self.mppar_a),file=output) 
 
 
 
