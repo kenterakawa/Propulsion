@@ -84,8 +84,8 @@ class Pintle:
         self.mppar_a = ORD_FMR_a
         
         #mixing paramter, final momemtum ratio
-        self.mppar_C1 = Dist_Lo1/self.Fuel_vf*self.mppar_a*CN_N1/np.pi/Dist_Dp*self.BLF1/(1-self.BLF1)
-        self.mppar_C2 = Dist_Lo2/self.Fuel_vf*self.mppar_a*CN_N2/np.pi/Dist_Dp*self.BLF2/(1-self.BLF2)
+        self.mppar_C1 = Dist_Lo1/self.Fuel_vf*self.mppar_a/np.pi/Dist_Dp*self.BLF1/(1-self.BLF1)
+        self.mppar_C2 = Dist_Lo2/self.Fuel_vf*self.mppar_a/np.pi/Dist_Dp*self.BLF2/(1-self.BLF2)
         self.mp1 = (rho_f*self.Fuel_vf**2*(Dist_Dfo-Dist_Dp)/2*(Dist_deltao1+2*self.mppar_C1*Dist_Lo1))/(rho_o*self.LOx_vo1**2*Dist_deltao1*Dist_Lo1)
         self.mp2 = (rho_f*self.Fuel_vf**2*(Dist_Dfo-Dist_Dp)/2*(Dist_deltao2+2*self.mppar_C2*Dist_Lo2))/(rho_o*self.LOx_vo1**2*Dist_deltao2*Dist_Lo2)
 
